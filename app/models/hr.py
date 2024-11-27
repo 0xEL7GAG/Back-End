@@ -32,12 +32,12 @@ class EmployeesQ(BaseModel):
     name: str
     jopTitle: str
     salary:int
-    projects:list  | None = None
-    checkIn: int
-    checkOut: int
-    StartOverTime: int
-    FinishOverTime: int
-    Attendence:int
+    projects:list | None = None
+    checkIn: int | None = None
+    checkOut: int | None = None
+    StartOverTime: int | None = None
+    FinishOverTime: int | None = None
+    Attendence:int | None = None
     numberOfOverTime:int
 
 
