@@ -200,32 +200,6 @@ def get_all_employees(session: Session = Depends(get_session)):
     result = session.exec(statment).all()
     return {"message": result}
 
-<<<<<<< HEAD
 
 
 @app.get("/api/user_request",tags=)
-=======
-@app.get("/api/employees/{id}", tags=["Employees"])
-def get_employee_by_id(id: str, session: Session = Depends(get_session)):
-    statment = select(Employees).where(Employees.id == id)
-    result = session.exec(statment).first()
-    
-    if not result:
-        raise HTTPException(status_code=404, detail="This is user is not exists")
-    
-    return {"message": result}
-
-@app.post("/api/employees", tags=["Employees"])
-def create_new_employee(emp: EmployeesQ, session: Session = Depends(get_session)):
-    statment = select(Employees).where(Employees.id == emp.id)
-    result = session.exec(statment)
-    
-    if result:
-        raise HTTPException(status_code=406, detail="This user already exists")
-    
-    new_emp = Employees(id=emp.id, name=emp.name, jopTitle=emp.jopTitle, salary=emp.salary, projects=emp.projects, checkIn=emp.checkIn, checkOut=emp.checkOut, StartOverTime=emp.StartOverTime, FinishOverTime=emp.FinishOverTime, Attendence=emp.Attendence, numberOfOverTime=emp.numberOfOverTime)
-    session.add(new_emp)
-    session.commit()
-    
-    return {"message": "New emplyeee created"}
->>>>>>> ammar-dev
