@@ -25,3 +25,26 @@ def get_all_hr_info(session: Session = Depends(get_session)):
     statment = select(Hr)
     result = session.exec(statment).all()
     return {"message": result}
+
+@app.post("/api/hr", tags=["Hr"])
+def create_new_hr(hr: HrQ, session: Session = Depends(get_session)):
+    statment = select(Hr).where(Hr.id == hr.id)
+    result = session.exec(statment)
+
+    if result:
+        return {"message": "This hr already exist"}
+    
+    new_hr = Hr(id=hr.id, name=hr.name, salary=hr.salary, jobTitle=hr.jobTitle)
+    session.add(new_hr)
+    session.commit()
+    return {"message": "New Hr created"}
+
+@app.get("/api/hr/{id}", tags=["Hr"])
+def get_hr_by_id(id: str, session: Session = Depends(get_session)):
+    statment = select(Hr).where(Hr.id == id)
+    result = session.exec(statment).first()
+
+    if not result:
+        return {"message": "This hr not found"}
+    
+    return {"message": result}
