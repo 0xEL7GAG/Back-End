@@ -1,7 +1,7 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
-from fastapi import FastAPI, Depends
-from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks, User_Request
-from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ, User_RequestQ
+from fastapi import FastAPI, Depends, HTTPException
+from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks
+from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ
 from dotenv import load_dotenv
 import os
 
@@ -200,28 +200,26 @@ def get_all_employees(session: Session = Depends(get_session)):
     result = session.exec(statment).all()
     return {"message": result}
 
-
-
-@app.get("/api/user_request",tags=["User_Request"])
-def get_all_requests(session:Session=Depends(get_session)):
-    statment=select(User_Request)
-    result = session.exec(statment).all()
+@app.get("/api/employees/{id}", tags=["Employees"])
+def get_employee_by_id(id: str, session: Session = Depends(get_session)):
+    statment = select(Employees).where(Employees.id == id)
+    result = session.exec(statment).first()
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="This is user is not exists")
+    
     return {"message": result}
 
-
-
-@app.post("/api/user_requist", tags=["User_Request"])
-def create_new_request(user_request: User_RequestQ, session: Session = Depends(get_session)):
-    statement = select(User_Request).where(User_Request.id == user_request.id)
-    result = session.exec(statement).first()
-
+@app.post("/api/employees", tags=["Employees"])
+def create_new_employee(emp: EmployeesQ, session: Session = Depends(get_session)):
+    statment = select(Employees).where(Employees.id == emp.id)
+    result = session.exec(statment)
+    
     if result:
-        return {"message": "User_Request with this ID already exists"}
-
-    new_requist = User_Request(id=user_request.id, name=user_request.name, employee_id=user_request.employee_id, jopTitle=user_request.jopTitle,requestType=user_request.requestType,createdAt=user_request.createdAt,status=user_request.status,)
-    session.add(new_requist)
+        raise HTTPException(status_code=406, detail="This user already exists")
+    
+    new_emp = Employees(id=emp.id, name=emp.name, jopTitle=emp.jopTitle, salary=emp.salary, projects=emp.projects, checkIn=emp.checkIn, checkOut=emp.checkOut, StartOverTime=emp.StartOverTime, FinishOverTime=emp.FinishOverTime, Attendence=emp.Attendence, numberOfOverTime=emp.numberOfOverTime)
+    session.add(new_emp)
     session.commit()
-    return {"message": "Requist created successfully"}
-
-
-
+    
+    return {"message": "New emplyeee created"}
