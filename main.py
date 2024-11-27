@@ -202,4 +202,8 @@ def get_all_employees(session: Session = Depends(get_session)):
 
 
 
-@app.get("/api/user_request",tags=)
+@app.get("/api/user_request",tags=["User_Request"])
+def get_all_requests(session:Session=Depends(get_session)):
+    statment=select(User_Request)
+    result = session.exec(statment).all()
+    return {"message": result}
