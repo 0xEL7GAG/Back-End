@@ -33,13 +33,13 @@ class EmployeesQ(BaseModel):
     jopTitle: str
     salary:int
     projects:list | None = None
-    checkIn: int | None = None
-    checkOut: int | None = None
-    StartOverTime: int | None = None
-    FinishOverTime: int | None = None
-    Attendence:int | None = None
-    numberOfOverTime:int | None = None
-
+    checkIn: int=0 
+    checkOut: int=0 
+    StartOverTime: int=0 
+    FinishOverTime: int=0
+    Attendence:int =0
+    numberOfOverTime:int=0
+     
 class User_RequestQ(BaseModel):
     id: str 
     employee_id: str 

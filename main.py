@@ -215,9 +215,9 @@ def create_new_employee(emp: EmployeesQ, session: Session = Depends(get_session)
     statment = select(Employees).where(Employees.id == emp.id)
     result = session.exec(statment)
     
-    if result:
-        raise HTTPException(status_code=406, detail="This user already exists")
-    
+    if not result:
+        # raise HTTPException(status_code=406, detail=result)
+          return  result
     new_emp = Employees(id=emp.id, name=emp.name, jopTitle=emp.jopTitle, salary=emp.salary, projects=emp.projects, checkIn=emp.checkIn, checkOut=emp.checkOut, StartOverTime=emp.StartOverTime, FinishOverTime=emp.FinishOverTime, Attendence=emp.Attendence, numberOfOverTime=emp.numberOfOverTime)
     session.add(new_emp)
     session.commit()
