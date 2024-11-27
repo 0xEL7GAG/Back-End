@@ -1,7 +1,7 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends
-from app.database.model import Hr
-from app.models.hr import HrQ
+from app.database.model import Events, Hr, Meetings, Profile, Tasks
+from app.models.hr import EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ
 from dotenv import load_dotenv
 import os
 
@@ -61,3 +61,186 @@ def delete_exist_hr(hr_id: str, session: Session = Depends(get_session)):
     session.commit()
 
     return {"message": "Hr deleted succeful"}
+
+
+
+# Tasks
+
+@app.get("/api/tasks", tags=["Tasks"])
+def get_all_tasks(session: Session = Depends(get_session)):
+    statement = select(Tasks)
+    result = session.exec(statement).all()
+    return {"tasks": result}
+
+@app.post("/api/tasks", tags=["Tasks"])
+def create_task(task: TasksQ, session: Session = Depends(get_session)):
+    statement = select(Tasks).where(Tasks.id == task.id)
+    result = session.exec(statement).first()
+
+    if result:
+        return {"message": "Task with this ID already exists"}
+
+    new_task = Tasks(id=task.id, task_name=task.task_name, deadline=task.deadline, calendar=task.calendar)
+    session.add(new_task)
+    session.commit()
+    return {"message": "Task created successfully"}
+
+@app.get("/api/tasks/{id}", tags=["Tasks"])
+def get_task_by_id(id: int, session: Session = Depends(get_session)):
+    statement = select(Tasks).where(Tasks.id == id)
+    result = session.exec(statement).first()
+
+    if not result:
+        return {"message": "Task not found"}
+    return {"task": result}
+
+@app.delete("/api/tasks/{id}", tags=["Tasks"])
+def delete_task(id: int, session: Session = Depends(get_session)):
+    statement = select(Tasks).where(Tasks.id == id)
+    result = session.exec(statement).first()
+
+    if not result:
+        return {"message": "Task not found"}
+
+    session.delete(result)
+    session.commit()
+    return {"message": "Task deleted successfully"}
+
+
+# Meetings
+
+@app.get("/api/meetings", tags=["Meetings"])
+def get_all_meetings(session: Session = Depends(get_session)):
+    statement = select(Meetings)
+    result = session.exec(statement).all()
+    return {"meetings": result}
+
+@app.post("/api/meetings", tags=["Meetings"])
+def create_meeting(meeting: MeetingsQ, session: Session = Depends(get_session)):
+    statement = select(Meetings).where(Meetings.id == meeting.id)
+    result = session.exec(statement).first()
+
+    if result:
+        return {"message": "Meeting with this ID already exists"}
+
+    new_meeting = Meetings(id=meeting.id, name=meeting.name, during_time=meeting.during_time, calendar=meeting.calendar)
+    session.add(new_meeting)
+    session.commit()
+    return {"message": "Meeting created successfully"}
+
+@app.get("/api/meetings/{id}", tags=["Meetings"])
+def get_meeting_by_id(id: int, session: Session = Depends(get_session)):
+    statement = select(Meetings).where(Meetings.id == id)
+    result = session.exec(statement).first()
+
+    if not result:
+        return {"message": "Meeting not found"}
+    return {"meeting": result}
+
+@app.delete("/api/meetings/{id}", tags=["Meetings"])
+def delete_meeting(id: int, session: Session = Depends(get_session)):
+    statement = select(Meetings).where(Meetings.id == id)
+    result = session.exec(statement).first()
+
+    if not result:
+        return {"message": "Meeting not found"}
+
+    session.delete(result)
+    session.commit()
+    return {"message": "Meeting deleted successfully"}
+
+
+
+#Events
+
+@app.get("/api/events", tags=["Events"])
+def get_all_events(session: Session = Depends(get_session)):
+    statement = select(Events)
+    result = session.exec(statement).all()
+    return {"events": result}
+
+@app.post("/api/events", tags=["Events"])
+def create_event(event: EventsQ, session: Session = Depends(get_session)):
+    statement = select(Events).where(Events.id == event.id)
+    result = session.exec(statement).first()
+
+    if result:
+        return {"message": "Event with this ID already exists"}
+
+    new_event = Events(id=event.id, name=event.name, during_time=event.during_time, calendar=event.calendar)
+    session.add(new_event)
+    session.commit()
+    return {"message": "Event created successfully"}
+
+@app.get("/api/events/{id}", tags=["Events"])
+def get_event_by_id(id: int, session: Session = Depends(get_session)):
+    statement = select(Events).where(Events.id == id)
+    result = session.exec(statement).first()
+
+    if not result:
+        return {"message": "Event not found"}
+    return {"event": result}
+
+@app.delete("/api/events/{id}", tags=["Events"])
+def delete_event(id: int, session: Session = Depends(get_session)):
+    statement = select(Events).where(Events.id == id)
+    result = session.exec(statement).first()
+
+    if not result:
+        return {"message": "Event not found"}
+
+    session.delete(result)
+    session.commit()
+    return {"message": "Event deleted successfully"}
+
+
+#HR
+
+@app.post("/api/profiles", tags=["Profiles"])
+def create_profile(profile: ProfileQ, session: Session = Depends(get_session)):
+    # Check if HR ID exists
+    hr = session.get(Hr, profile.id)
+    if not hr:
+        return {"message": "HR ID not found"}
+    
+    # Create Profile
+    new_profile = Profile(**profile.dict())
+    session.add(new_profile)
+    session.commit()
+    return {"message": "Profile created successfully"}
+
+@app.get("/api/profiles/{id}", tags=["Profiles"])
+def get_profile(id: str, session: Session = Depends(get_session)):
+    profile = session.get(Profile, id)
+    if not profile:
+        return {"message": "Profile not found"}
+    return {"profile": profile}
+
+@app.put("/api/profiles/{id}", tags=["Profiles"])
+def update_profile(id: str, profile_data: ProfileQ, session: Session = Depends(get_session)):
+    profile = session.get(Profile, id)
+    if not profile:
+        return {"message": "Profile not found"}
+
+    for key, value in profile_data.dict().items():
+        setattr(profile, key, value)
+    
+    session.commit()
+    return {"message": "Profile updated successfully"}
+
+
+@app.delete("/api/profiles/{id}", tags=["Profiles"])
+def delete_profile(id: str, session: Session = Depends(get_session)):
+    profile = session.get(Profile, id)
+    if not profile:
+        return {"message": "Profile not found"}
+
+    session.delete(profile)
+    session.commit()
+    return {"message": "Profile deleted successfully"}
+
+
+
+
+
+
