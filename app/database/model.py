@@ -1,3 +1,5 @@
+from typing import List, Optional
+from sqlalchemy import JSON
 from sqlmodel import Relationship, SQLModel, Field
 
 class Hr(SQLModel, table=True):
@@ -6,6 +8,12 @@ class Hr(SQLModel, table=True):
     name: str
     salary: str
     jobTitle: str
+    check_in: int  # Check-in time
+    check_out: int  # Check-out time
+    start_over_time: int  # Start of overtime
+    finish_over_time: int  # End of overtime
+    attendens: int  # Attendance count
+    number_of_over_time: int  # Number of overtime hours
 
 
 class Tasks(SQLModel, table=True):
@@ -31,16 +39,18 @@ class Events(SQLModel, table=True):
     calendar: str  # Calendar reference
 
 
-class Profile(SQLModel, table=True):
-    __tablename__ = "profiles"  # Name of the table
-    id: str = Field(primary_key=True, foreign_key="hr.id")  # Foreign key referencing Hr.id
-    check_in: int  # Check-in time
-    check_out: int  # Check-out time
-    start_over_time: int  # Start of overtime
-    finish_over_time: int  # End of overtime
-    attendens: int  # Attendance count
-    number_of_over_time: int  # Number of overtime hours
 
-    # Relationship field (optional)
-    hr: "Hr" = Relationship(back_populates="profile")
 
+class Employees(SQLModel, table=True):
+    __tablename__="Employees"
+    id: str= Field(primary_key=True)
+    name: str
+    jopTitle: str
+    salary:int
+    projects: Optional[List[str]] = Field(default=None, sa_type=JSON)
+    checkIn: int
+    checkOut: int
+    StartOverTime: int
+    FinishOverTime: int
+    Attendence:int
+    numberOfOverTime:int

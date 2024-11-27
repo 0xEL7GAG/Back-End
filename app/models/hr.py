@@ -27,11 +27,15 @@ class EventsQ(BaseModel):
     calendar: str
 
 
-class ProfileQ(BaseModel):
-    id: str  # Must match an existing Hr.id
-    check_in: int
-    check_out: int
-    start_over_time: int
-    finish_over_time: int
-    attendens: int
-    number_of_over_time: int
+class EmployeesQ(BaseModel):
+    id: str
+    name: str
+    jopTitle: str
+    salary:int
+    projects:list  | None = None
+    checkIn: int
+    checkOut: int
+    StartOverTime: int
+    FinishOverTime: int
+    Attendence:int
+    numberOfOverTime:int
