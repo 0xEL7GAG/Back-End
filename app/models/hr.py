@@ -39,3 +39,14 @@ class EmployeesQ(BaseModel):
     FinishOverTime: int
     Attendence:int
     numberOfOverTime:int
+
+
+class User_RequestQ(BaseModel):
+    id: str 
+    employee_id: str 
+    name: str
+    jopTitle: str
+    requestType: str
+    createdAt: str
+    status: str
+
