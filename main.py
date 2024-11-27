@@ -1,7 +1,7 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends, HTTPException
-from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks, User_Request
-from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ, User_RequestQ
+from app.database.model import Employees, Events, Hr, Meetings , Tasks, User_Request
+from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ , TasksQ, User_RequestQ
 from dotenv import load_dotenv
 import os
 
