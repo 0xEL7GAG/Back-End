@@ -38,8 +38,7 @@ class EmployeesQ(BaseModel):
     StartOverTime: int | None = None
     FinishOverTime: int | None = None
     Attendence:int | None = None
-    numberOfOverTime:int
-
+    numberOfOverTime:int | None = None
 
 class User_RequestQ(BaseModel):
     id: str 
