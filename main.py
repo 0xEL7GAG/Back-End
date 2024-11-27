@@ -199,3 +199,10 @@ def get_all_employees(session: Session = Depends(get_session)):
     statment = select(Employees)
     result = session.exec(statment).all()
     return {"message": result}
+
+@app.get("/api/employees/{id}", tags=["Employees"])
+def get_employee_by_id(id: str, session: Session = Depends(get_session)):
+    statment = select(Employees).where(Employees.id == id)
+    result = session.exec(statment).first()
+    
+    return {"message": result}
