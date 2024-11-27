@@ -1,5 +1,5 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks
 from app.models.hr import EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ
 from dotenv import load_dotenv
@@ -204,5 +204,8 @@ def get_all_employees(session: Session = Depends(get_session)):
 def get_employee_by_id(id: str, session: Session = Depends(get_session)):
     statment = select(Employees).where(Employees.id == id)
     result = session.exec(statment).first()
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="This is user is not exists")
     
     return {"message": result}
