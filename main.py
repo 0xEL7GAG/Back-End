@@ -1,6 +1,6 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends, HTTPException
-from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks
+from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks, User_Request
 from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ
 from dotenv import load_dotenv
 import os
