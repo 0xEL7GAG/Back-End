@@ -1,7 +1,7 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends, HTTPException
-from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks
-from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ
+from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks, User_Request
+from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ, User_RequestQ
 from dotenv import load_dotenv
 import os
 
@@ -223,3 +223,26 @@ def create_new_employee(emp: EmployeesQ, session: Session = Depends(get_session)
     session.commit()
     
     return {"message": "New emplyeee created"}
+
+
+@app.get("/api/user_request",tags=["User_Request"])
+def get_all_requests(session:Session=Depends(get_session)):
+    statment=select(User_Request)
+    result = session.exec(statment).all()
+    return {"message": result}
+
+
+
+@app.post("/api/user_requist", tags=["User_Request"])
+def create_new_request(user_request: User_RequestQ, session: Session = Depends(get_session)):
+    statement = select(User_Request).where(User_Request.id == user_request.id)
+    result = session.exec(statement).first()
+
+    if result:
+        return {"message": "User_Request with this ID already exists"}
+
+    new_requist = User_Request(id=user_request.id, name=user_request.name, employee_id=user_request.employee_id, jopTitle=user_request.jopTitle,requestType=user_request.requestType,createdAt=user_request.createdAt,status=user_request.status,)
+    session.add(new_requist)
+    session.commit()
+    return {"message": "Requist created successfully"}
+
