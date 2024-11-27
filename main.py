@@ -1,6 +1,6 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends
-from app.database.model import Events, Hr, Meetings, Profile, Tasks
+from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks
 from app.models.hr import EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ
 from dotenv import load_dotenv
 import os
@@ -194,3 +194,8 @@ def delete_event(id: int, session: Session = Depends(get_session)):
     return {"message": "Event deleted successfully"}
 
 
+@app.get("/api/employees", tags=["Employees"])
+def get_all_employees(session: Session = Depends(get_session)):
+    statment = select(Employees)
+    result = session.exec(statment).all()
+    return {"message": result}
