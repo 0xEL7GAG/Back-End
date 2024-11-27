@@ -1,4 +1,4 @@
-from sqlmodel import create_engine, Session, SQLModel, select
+from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends
 from app.database.model import Hr
 from app.models.hr import HrQ
@@ -48,3 +48,16 @@ def get_hr_by_id(id: str, session: Session = Depends(get_session)):
         return {"message": "This hr not found"}
     
     return {"message": result}
+
+@app.delete("/api/hr/{hr_id}", tags=["Hr"])
+def delete_exist_hr(hr_id: str, session: Session = Depends(get_session)):
+    statment = select(Hr).where(Hr.id == hr_id)
+    result = session.exec(statment)
+
+    if not result:
+        return {"message": "This hr not found"}
+    
+    session.delete(result)
+    session.commit()
+
+    return {"message": "Hr deleted succeful"}
