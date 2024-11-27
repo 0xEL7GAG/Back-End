@@ -42,7 +42,7 @@ class Events(SQLModel, table=True):
 
 
 class Employees(SQLModel, table=True):
-    __tablename__="Employees"
+    __tablename__="employees"
     id: str= Field(primary_key=True)
     name: str
     jopTitle: str
@@ -54,3 +54,14 @@ class Employees(SQLModel, table=True):
     FinishOverTime: int
     Attendence:int
     numberOfOverTime:int
+
+
+class User_Request(SQLModel, table=True):
+    __tablename__="User_Request"
+    id: str= Field(primary_key=True)
+    name:str =Field(foreign_key="employees.name")
+    jopTitle: str =Field(foreign_key="employees.jopTitle")
+    UserId:str =Field(foreign_key="employees.id")
+    requestType:str
+    createdAt:str
+    status:str
