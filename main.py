@@ -1,7 +1,7 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends, HTTPException
 from app.database.model import Employees, Events, Hr, Meetings, Profile, Tasks
-from app.models.hr import EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ
+from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ, ProfileQ, TasksQ
 from dotenv import load_dotenv
 import os
 
@@ -209,3 +209,17 @@ def get_employee_by_id(id: str, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="This is user is not exists")
     
     return {"message": result}
+
+@app.post("/api/employees", tags=["Employees"])
+def create_new_employee(emp: EmployeesQ, session: Session = Depends(get_session)):
+    statment = select(Employees).where(Employees.id == emp.id)
+    result = session.exec(statment)
+    
+    if result:
+        raise HTTPException(status_code=406, detail="This user already exists")
+    
+    new_emp = Employees(id=emp.id, name=emp.name, jopTitle=emp.jopTitle, salary=emp.salary, projects=emp.projects, checkIn=emp.checkIn, checkOut=emp.checkOut, StartOverTime=emp.StartOverTime, FinishOverTime=emp.FinishOverTime, Attendence=emp.Attendence, numberOfOverTime=emp.numberOfOverTime)
+    session.add(new_emp)
+    session.commit()
+    
+    return {"message": "New emplyeee created"}
