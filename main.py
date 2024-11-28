@@ -1,7 +1,7 @@
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends, HTTPException
 from app.database.model import Employees, Events, Hr, Meetings , Tasks, User_Request
-from app.models.hr import EmployeesQ, EventsQ, HrQ, MeetingsQ , TasksQ, User_RequestQ
+from app.models.hr import EmployeesQ, EmployeesUQ, EventsQ, HrQ, MeetingsQ , TasksQ, User_RequestQ
 from dotenv import load_dotenv
 import os
 
@@ -224,6 +224,34 @@ def create_new_employee(emp: EmployeesQ, session: Session = Depends(get_session)
     
     return {"message": "New emplyeee created"}
 
+@app.put("/api/employees/{id}", tags=["Employees"])
+def update_exist_user(id: str, emp: EmployeesUQ, session: Session = Depends):
+    statment = select(Employees).where(Employees.id == emp.id)
+    result = session.exec(statment).first()
+
+    if not result:
+        return {"message": "Employee not found"}
+    
+    if emp.projects:
+        result.projects =  emp.projects
+    if emp.checkIn:
+        result.checkIn = emp.checkIn
+    if emp.checkOut:
+        result.checkOut = emp.checkOut
+    if emp.StartOverTime:
+        result.StartOverTime = emp.StartOverTime
+    if emp.FinishOverTime:
+        result.FinishOverTime = emp.FinishOverTime
+    if emp.Attendence:
+        result.Attendence = emp.Attendence
+    if emp.numberOfOverTime:
+        result.numberOfOverTime = emp.numberOfOverTime
+
+    session.add(result)
+    session.commit()
+    session.refresh(result)
+
+    return {"message": f"User with id {result.id} updated successfully", "employee": result}
 
 @app.get("/api/user_request",tags=["User_Request"])
 def get_all_requests(session:Session=Depends(get_session)):

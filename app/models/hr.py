@@ -39,6 +39,15 @@ class EmployeesQ(BaseModel):
     FinishOverTime: int=0
     Attendence:int =0
     numberOfOverTime:int=0
+
+class  EmployeesUQ(BaseModel):
+    projects:list | None = None
+    checkIn:int = 0
+    checkOut:int = 0
+    StartOverTime:int= 0 
+    FinishOverTime:int= 0
+    Attendence:int = 0
+    numberOfOverTime:int = 0
      
 class User_RequestQ(BaseModel):
     id: str 
