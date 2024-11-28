@@ -2,7 +2,7 @@ from typing import List
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends, HTTPException
 from app.database.model import Employees, Events, Hr, Meetings , Tasks, User_Request
-from app.models.hr import EmployeesQ, EmployeesUQ, EventsQ, HrQ, MeetingsQ , TasksQ, User_RequestQ
+from app.models.hr import EmployeesQ, EmployeesUQ, EventsQ, HrQ, HrUQ, MeetingsQ , TasksQ, User_RequestQ
 from dotenv import load_dotenv
 import os
 
@@ -30,15 +30,65 @@ def get_all_hr_info(session: Session = Depends(get_session)):
 @app.post("/api/hr", tags=["Hr"])
 def create_new_hr(hr: HrQ, session: Session = Depends(get_session)):
     statment = select(Hr).where(Hr.id == hr.id)
-    result = session.exec(statment)
+    result = session.exec(statment).first()
 
     if result:
         return {"message": "This hr already exist"}
     
-    new_hr = Hr(id=hr.id, name=hr.name, salary=hr.salary, jobTitle=hr.jobTitle)
+    new_hr = Hr(id=hr.id, name=hr.name, salary=hr.salary, jobTitle=hr.jobTitle, check_in=hr.check_in, check_out=hr.check_out, start_over_time=hr.check_out, finish_over_time=hr.finish_over_time, attendens=hr.attendens, number_of_over_time=hr.number_of_over_time)
     session.add(new_hr)
     session.commit()
     return {"message": "New Hr created"}
+
+# @app.put("/api/hr/{id}", tags=["Hr"])
+# def update_hr_by_id(id: str, hr: HrUQ, session: Session = Depends(get_session)):
+#     statment = select(Hr).where(Hr.id == id)
+#     result = session.exec(statment).first()
+    
+#     if not result:
+#         return {"message": "This hr not found"}
+    
+#     if result.name:
+#         result.name = hr.name
+#     if result.jobTitle:
+#         result.jobTitle = hr.jobTitle   
+#     if result.salary != 0:
+#         result.salary = hr.salary
+#     if result.check_in != 0:
+#         result.check_in = hr.check_in
+#     if result.check_out != 0:
+#         result.check_out = hr.check_out
+#     if result.start_over_time != 0:
+#         result.start_over_time = hr.start_over_time
+#     if result.finish_over_time != 0:
+#         result.finish_over_time = hr.finish_over_time
+#     if result.attendens != 0:
+#         result.attendens = hr.attendens
+#     if result.number_of_over_time != 0:
+#         result.number_of_over_time = hr.number_of_over_time
+    
+#     session.add(result)
+#     session.commit()
+#     session.refresh(result)
+    
+#     return {"message": "Hr updated succeffuly"}
+
+@app.put("/api/hr/{id}", tags=["Hr"])
+def update_hr_by_id(id: str, hr: HrUQ, session: Session = Depends(get_session)):
+    statement = select(Hr).where(Hr.id == id)
+    result = session.exec(statement).first()
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="HR not found")
+    
+    for field, value in hr.dict(exclude_unset=True).items():
+        setattr(result, field, value)
+    
+    session.add(result)
+    session.commit()
+    session.refresh(result)
+    
+    return {"message": "HR updated successfully"}
 
 @app.get("/api/hr/{id}", tags=["Hr"])
 def get_hr_by_id(id: str, session: Session = Depends(get_session)):
@@ -53,7 +103,7 @@ def get_hr_by_id(id: str, session: Session = Depends(get_session)):
 @app.delete("/api/hr/{hr_id}", tags=["Hr"])
 def delete_exist_hr(hr_id: str, session: Session = Depends(get_session)):
     statment = select(Hr).where(Hr.id == hr_id)
-    result = session.exec(statment)
+    result = session.exec(statment).first()
 
     if not result:
         return {"message": "This hr not found"}
@@ -61,7 +111,7 @@ def delete_exist_hr(hr_id: str, session: Session = Depends(get_session)):
     session.delete(result)
     session.commit()
 
-    return {"message": "Hr deleted succeful"}
+    return {"message": "Hr deleted succeffuly"}
 
 
 
@@ -81,7 +131,7 @@ def create_task(task: TasksQ, session: Session = Depends(get_session)):
     if result:
         return {"message": "Task with this ID already exists"}
 
-    new_task = Tasks(id=task.id, task_name=task.task_name, deadline=task.deadline, calendar=task.calendar)
+    new_task = Tasks(id=task.id, task_name=task.task_name, deadline=task.deadline)
     session.add(new_task)
     session.commit()
     return {"message": "Task created successfully"}
@@ -124,7 +174,7 @@ def create_meeting(meeting: MeetingsQ, session: Session = Depends(get_session)):
     if result:
         return {"message": "Meeting with this ID already exists"}
 
-    new_meeting = Meetings(id=meeting.id, name=meeting.name, during_time=meeting.during_time, calendar=meeting.calendar)
+    new_meeting = Meetings(id=meeting.id, name=meeting.name, during_time=meeting.during_time)
     session.add(new_meeting)
     session.commit()
     return {"message": "Meeting created successfully"}
@@ -168,7 +218,7 @@ def create_event(event: EventsQ, session: Session = Depends(get_session)):
     if result:
         return {"message": "Event with this ID already exists"}
 
-    new_event = Events(id=event.id, name=event.name, during_time=event.during_time, calendar=event.calendar)
+    new_event = Events(id=event.id, name=event.name, during_time=event.during_time)
     session.add(new_event)
     session.commit()
     return {"message": "Event created successfully"}
@@ -253,26 +303,63 @@ def update_exist_user(id: str, emp: EmployeesUQ, session: Session = Depends(get_
 
     return result
 
-
-@app.get("/api/user_request",tags=["User_Request"])
-def get_all_requests(session:Session=Depends(get_session)):
-    statment=select(User_Request)
-    result = session.exec(statment).all()
-    return {"message": result}
-
-
-
-@app.post("/api/user_request{id}", tags=["User_Request"])
-def create_new_request(id: str ,user_request: User_RequestQ, session: Session = Depends(get_session)):
-    statement = select(User_Request).where(User_Request.id == id)
-    result = session.exec(statement).first()
-
-    if result:
-        return {"message": "User_Request with this ID already exists"}
-
-    data = session.get(Employees, user_request.employee_id)
-    new_requist = User_Request(name=data.name, employee_id=id, jopTitle=data.jopTitle, requestType=user_request.requestType, createdAt=user_request.createdAt, status=user_request.status, employee=data)
-    session.add(new_requist)
+@app.delete("/api/employees/{id}", tags=["Employees"])
+def delete_exist_emp(id: str, session: Session = Depends(get_session)):
+    statment = select(Employees).where(Employees.id == id)
+    result = session.exec(statment).first()
+    
+    if not result:
+        return {"message": "not found"}
+    
+    session.delete(result)
     session.commit()
-    return {"message": "Requist created successfully"}
+    
+    return {"message": "deleted"}
 
+@app.get("/api/user_request", tags=["User_Request"])
+def get_all_requests(session: Session = Depends(get_session)):
+    
+    statement = (
+        select(
+            User_Request.id,
+            User_Request.requestType,
+            User_Request.createdAt,
+            User_Request.status,
+            Employees.name,
+            Employees.jopTitle
+        )
+        .join(Employees, Employees.id == User_Request.employee_id)
+    )
+    result = session.exec(statement).all()
+
+    return [
+        {
+            "request_id": row[0],
+            "requestType": row[1],
+            "createdAt": row[2],
+            "status": row[3],
+            "employeeName": row[4],
+            "jobTitle": row[5],
+        }
+        for row in result
+    ]
+
+
+
+
+@app.post("/api/user_request", tags=["User_Request"])
+def create_new_request(user_request: User_RequestQ, session: Session = Depends(get_session)):
+    data = session.get(Employees, user_request.employee_id)
+    new_request = User_Request(employee_id=user_request.employee_id, requestType=user_request.requestType, createdAt=user_request.createdAt, status=user_request.status, employee=data)
+    session.add(new_request)
+    session.commit()
+    session.refresh(new_request)
+    
+    return {"message": "New request created for user with this data", "user": new_request.employee}
+
+@app.get("/api/user_request/{id}", tags=["User_Request"])
+def get_request_by_emp_id(id: str, session: Session = Depends(get_session)):
+    statment = select(User_Request).where(User_Request.employee_id == id)
+    result = session.exec(statment).all()
+    
+    return result

@@ -8,12 +8,12 @@ class Hr(SQLModel, table=True):
     name: str
     salary: str
     jobTitle: str
-    check_in: int  # Check-in time
-    check_out: int  # Check-out time
-    start_over_time: int  # Start of overtime
-    finish_over_time: int  # End of overtime
-    attendens: int  # Attendance count
-    number_of_over_time: int  # Number of overtime hours
+    check_in: int
+    check_out: int
+    start_over_time: int
+    finish_over_time: int
+    attendens: int
+    number_of_over_time: int
 
 
 class Tasks(SQLModel, table=True):
@@ -21,7 +21,6 @@ class Tasks(SQLModel, table=True):
     id: int = Field(primary_key=True, unique=True, index=True)
     task_name: str
     deadline: str
-    calendar: str
 
 
 class Meetings(SQLModel, table=True):
@@ -29,14 +28,12 @@ class Meetings(SQLModel, table=True):
     id: int = Field(primary_key=True, unique=True, index=True)  # Unique ID
     name: str  # Meeting name
     during_time: str  # Duration or time of the meeting
-    calendar: str  # Calendar reference
 
 class Events(SQLModel, table=True):
     __tablename__ = "events"  # Table name
     id: int = Field(primary_key=True, unique=True, index=True)  # Unique ID
     name: str  # Event name
     during_time: str  # Duration or time of the event
-    calendar: str  # Calendar reference
 
 class Employees(SQLModel, table=True):
     __tablename__ = "employees"
@@ -52,16 +49,14 @@ class Employees(SQLModel, table=True):
     Attendence: int
     numberOfOverTime: int
 
-    # Relationship with User_Request
     requests: List["User_Request"] = Relationship(back_populates="employee")
 
 
 
 class User_Request(SQLModel, table=True):
     __tablename__ = "user_request"
-    id: str = Field(primary_key=True)
+    id:int = Field(default=None, primary_key=True)
     employee_id: str = Field(foreign_key="employees.id")
-    jopTitle: str
     requestType: str
     createdAt: str
     status: str
