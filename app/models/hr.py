@@ -1,3 +1,4 @@
+from typing import List, Optional
 from pydantic import BaseModel
 
 class HrQ(BaseModel):
@@ -40,14 +41,18 @@ class EmployeesQ(BaseModel):
     Attendence:int =0
     numberOfOverTime:int=0
 
-class  EmployeesUQ(BaseModel):
-    projects:list | None = None
-    checkIn:int = 0
-    checkOut:int = 0
-    StartOverTime:int= 0 
-    FinishOverTime:int= 0
-    Attendence:int = 0
-    numberOfOverTime:int = 0
+class EmployeesUQ(BaseModel):
+    id: str
+    name: str
+    jopTitle: str
+    salary: float
+    projects: Optional[List[str]] = []
+    checkIn: Optional[int] = None
+    checkOut: Optional[int] = None
+    StartOverTime: Optional[int] = None
+    FinishOverTime: Optional[int] = None
+    Attendence: Optional[int] = None
+    numberOfOverTime: Optional[int] = None
      
 class User_RequestQ(BaseModel):
     id: str 

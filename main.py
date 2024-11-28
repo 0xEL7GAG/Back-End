@@ -1,3 +1,4 @@
+from typing import List
 from sqlmodel import create_engine, Session, SQLModel, select, delete
 from fastapi import FastAPI, Depends, HTTPException
 from app.database.model import Employees, Events, Hr, Meetings , Tasks, User_Request
@@ -224,34 +225,34 @@ def create_new_employee(emp: EmployeesQ, session: Session = Depends(get_session)
     
     return {"message": "New emplyeee created"}
 
-@app.put("/api/employees/{id}", tags=["Employees"])
-def update_exist_user(id: str, emp: EmployeesUQ, session: Session = Depends):
-    statment = select(Employees).where(Employees.id == emp.id)
-    result = session.exec(statment).first()
+@app.put("/api/employees/{id}", response_model=EmployeesUQ, tags=["Employees"])
+def update_exist_user(id: str, emp: EmployeesUQ, session: Session = Depends(get_session)):
+    statement = select(Employees).where(Employees.id == id)
+    result = session.exec(statement).first()
 
     if not result:
-        return {"message": "Employee not found"}
-    
+        raise HTTPException(status_code=404, detail="Employee not found")
     if emp.projects:
-        result.projects =  emp.projects
-    if emp.checkIn:
+        result.projects = emp.projects
+    if emp.checkIn != 0:
         result.checkIn = emp.checkIn
-    if emp.checkOut:
+    if emp.checkOut != 0:
         result.checkOut = emp.checkOut
-    if emp.StartOverTime:
+    if emp.StartOverTime != 0:
         result.StartOverTime = emp.StartOverTime
-    if emp.FinishOverTime:
+    if emp.FinishOverTime != 0:
         result.FinishOverTime = emp.FinishOverTime
-    if emp.Attendence:
+    if emp.Attendence != 0:
         result.Attendence = emp.Attendence
-    if emp.numberOfOverTime:
+    if emp.numberOfOverTime != 0:
         result.numberOfOverTime = emp.numberOfOverTime
 
     session.add(result)
     session.commit()
     session.refresh(result)
 
-    return {"message": f"User with id {result.id} updated successfully", "employee": result}
+    return result
+
 
 @app.get("/api/user_request",tags=["User_Request"])
 def get_all_requests(session:Session=Depends(get_session)):
