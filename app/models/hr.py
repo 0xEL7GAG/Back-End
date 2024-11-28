@@ -1,5 +1,8 @@
 from typing import List, Optional
 from pydantic import BaseModel
+from datetime import datetime
+
+fullDate = f"{datetime.now().day}-{datetime.now().month}-{datetime.now().year}"
 
 class HrQ(BaseModel):
     id: str
@@ -55,11 +58,10 @@ class EmployeesUQ(BaseModel):
     numberOfOverTime: Optional[int] = None
      
 class User_RequestQ(BaseModel):
-    id: str 
     employee_id: str 
-    name: str
-    jopTitle: str
+    name: str | None = None
+    jopTitle: str | None = None
     requestType: str
-    createdAt: str
+    createdAt:str = fullDate
     status: str
 

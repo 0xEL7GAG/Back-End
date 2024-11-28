@@ -38,10 +38,6 @@ class Events(SQLModel, table=True):
     during_time: str  # Duration or time of the event
     calendar: str  # Calendar reference
 
-
-
-
-
 class Employees(SQLModel, table=True):
     __tablename__ = "employees"
     id: str = Field(primary_key=True)
@@ -64,18 +60,9 @@ class Employees(SQLModel, table=True):
 class User_Request(SQLModel, table=True):
     __tablename__ = "user_request"
     id: str = Field(primary_key=True)
-    
-    # Use foreign key to reference Employees' 'id' (which should be unique and a primary key)
-    employee_id: str = Field(foreign_key="employees.id")  # Reference the 'id' field in Employees table
-    
-    # Optional: If you want to store the employee name and job title, don't make them foreign keys.
-    # You can store them directly or use the related employee record for the name/title.
-    name: str
+    employee_id: str = Field(foreign_key="employees.id")
     jopTitle: str
-
     requestType: str
     createdAt: str
     status: str
-
-    # Relationship (Optional, if you want to easily access the employee from the request)
     employee: "Employees" = Relationship(back_populates="requests")

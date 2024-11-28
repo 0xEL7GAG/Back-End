@@ -262,15 +262,16 @@ def get_all_requests(session:Session=Depends(get_session)):
 
 
 
-@app.post("/api/user_requist", tags=["User_Request"])
-def create_new_request(user_request: User_RequestQ, session: Session = Depends(get_session)):
-    statement = select(User_Request).where(User_Request.id == user_request.id)
+@app.post("/api/user_request{id}", tags=["User_Request"])
+def create_new_request(id: str ,user_request: User_RequestQ, session: Session = Depends(get_session)):
+    statement = select(User_Request).where(User_Request.id == id)
     result = session.exec(statement).first()
 
     if result:
         return {"message": "User_Request with this ID already exists"}
 
-    new_requist = User_Request(id=user_request.id, name=user_request.name, employee_id=user_request.employee_id, jopTitle=user_request.jopTitle,requestType=user_request.requestType,createdAt=user_request.createdAt,status=user_request.status,)
+    data = session.get(Employees, user_request.employee_id)
+    new_requist = User_Request(name=data.name, employee_id=id, jopTitle=data.jopTitle, requestType=user_request.requestType, createdAt=user_request.createdAt, status=user_request.status, employee=data)
     session.add(new_requist)
     session.commit()
     return {"message": "Requist created successfully"}
